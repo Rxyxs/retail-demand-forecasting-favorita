@@ -1,0 +1,151 @@
+{
+  "panel": {
+    "total_rows": 3000888,
+    "series": 1782,
+    "stores": 54,
+    "families": 33,
+    "date_min": "2013-01-01",
+    "date_max": "2017-08-15",
+    "pre_opening_rows": 222057,
+    "pre_opening_share": 0.07399709685932963,
+    "zero_rows": 939130,
+    "zero_rows_pre_opening": 222057,
+    "zero_share_raw": 0.3129506999261552,
+    "zero_share_after_opening": 0.2580484383541137,
+    "zeros_explained_by_openings": 0.2364496928007837,
+    "severe_intermittent_raw": 173,
+    "severe_intermittent_clean": 135
+  },
+  "split": {
+    "valid_days": 16,
+    "train_rows": 2750319,
+    "valid_rows": 28512,
+    "train_end": "2017-07-30",
+    "valid_start": "2017-07-31"
+  },
+  "costs": {
+    "understock": 4.0,
+    "overstock": 1.0,
+    "critical_quantile": 0.8
+  },
+  "accuracy": {
+    "seasonal_naive": {
+      "rmsle": 0.6666261193166096,
+      "mae": 148.9315288291737,
+      "mase": 1.762466873742791,
+      "pinball_at_critical_q": 64.10804642289914
+    },
+    "lgbm_mean": {
+      "rmsle": 0.4148172594795844,
+      "mae": 68.50783801878356,
+      "mase": 0.8107268893904693,
+      "pinball_at_critical_q": 29.782616673091752
+    },
+    "lgbm_quantile": {
+      "rmsle": 0.5313293683716649,
+      "mae": 99.44194082929124,
+      "mase": 1.176803380386604,
+      "pinball_at_critical_q": 27.49901034046945
+    }
+  },
+  "inventory": {
+    "seasonal_naive": {
+      "order_total": 14303577.299578,
+      "demand_total": 13319179.781647999,
+      "units_short": 1630969.1160237002,
+      "units_excess": 2615366.6339537,
+      "understock_cost": 6523876.464094801,
+      "overstock_cost": 2615366.6339537,
+      "total_cost": 9139243.0980485,
+      "service_level": 0.6031846240179574,
+      "fill_rate": 0.8775473307845166
+    },
+    "lgbm_mean": {
+      "order_total": 13744132.355689954,
+      "demand_total": 13319179.781647999,
+      "units_short": 764171.451774801,
+      "units_excess": 1189124.025816756,
+      "understock_cost": 3056685.807099204,
+      "overstock_cost": 1189124.025816756,
+      "total_cost": 4245809.83291596,
+      "service_level": 0.5903829966329966,
+      "fill_rate": 0.9426262379288758
+    },
+    "lgbm_quantile": {
+      "order_total": 15431154.867097702,
+      "demand_total": 13319179.781647999,
+      "units_short": 361656.7657375244,
+      "units_excess": 2473631.8511872278,
+      "understock_cost": 1446627.0629500975,
+      "overstock_cost": 2473631.8511872278,
+      "total_cost": 3920258.9141373252,
+      "service_level": 0.8404180695847363,
+      "fill_rate": 0.9728469191296721
+    }
+  },
+  "sensitivity": [
+    {
+      "cost_ratio": 1.0,
+      "critical_quantile": 0.5,
+      "quantile_cost": 1934221.9856273266,
+      "mean_cost": 1953295.477591557,
+      "saving_vs_mean": 0.009764775571870055,
+      "quantile_service": 0.5993967452300786,
+      "mean_service": 0.5903829966329966
+    },
+    {
+      "cost_ratio": 2.0,
+      "critical_quantile": 0.6666666666666666,
+      "quantile_cost": 2876574.409455651,
+      "mean_cost": 2717466.929366358,
+      "saving_vs_mean": -0.058549923228097045,
+      "quantile_service": 0.7374789562289562,
+      "mean_service": 0.5903829966329966
+    },
+    {
+      "cost_ratio": 2.5,
+      "critical_quantile": 0.7142857142857143,
+      "quantile_cost": 3232452.87445823,
+      "mean_cost": 3099552.6552537587,
+      "saving_vs_mean": -0.042877225840704636,
+      "quantile_service": 0.7776725589225589,
+      "mean_service": 0.5903829966329966
+    },
+    {
+      "cost_ratio": 3.0,
+      "critical_quantile": 0.75,
+      "quantile_cost": 3496662.784140543,
+      "mean_cost": 3481638.3811411588,
+      "saving_vs_mean": -0.004315325532015635,
+      "quantile_service": 0.8030653759820426,
+      "mean_service": 0.5903829966329966
+    },
+    {
+      "cost_ratio": 4.0,
+      "critical_quantile": 0.8,
+      "quantile_cost": 3920258.9141373252,
+      "mean_cost": 4245809.83291596,
+      "saving_vs_mean": 0.07667581252810163,
+      "quantile_service": 0.8404180695847363,
+      "mean_service": 0.5903829966329966
+    },
+    {
+      "cost_ratio": 6.0,
+      "critical_quantile": 0.8571428571428571,
+      "quantile_cost": 4707317.888192185,
+      "mean_cost": 5774152.736465562,
+      "saving_vs_mean": 0.1847604136856278,
+      "quantile_service": 0.887135241301908,
+      "mean_service": 0.5903829966329966
+    },
+    {
+      "cost_ratio": 9.0,
+      "critical_quantile": 0.9,
+      "quantile_cost": 5684068.123994798,
+      "mean_cost": 8066667.0917899655,
+      "saving_vs_mean": 0.2953634928383386,
+      "quantile_service": 0.9210858585858586,
+      "mean_service": 0.5903829966329966
+    }
+  ]
+}

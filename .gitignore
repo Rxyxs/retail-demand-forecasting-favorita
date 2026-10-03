@@ -1,0 +1,29 @@
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+
+# Datos crudos de Kaggle: no se redistribuyen (ver licencia de la competencia).
+# Se reconstruyen con el comando documentado en el README.
+data/raw/
+
+# outputs/ SI se versiona entero: las figuras tienen que renderizar en GitHub sin
+# correr nada, y results.json es la evidencia de donde sale cada cifra del README
+# para que se pueda verificar sin reproducir el pipeline.
+
+# Credenciales: jamas en el repo
+kaggle.json
+.env
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

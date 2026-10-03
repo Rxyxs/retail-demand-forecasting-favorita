@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retail Demand Forecasting</title>
+<meta name="description" content="Demand forecasting on 3M rows of real grocery sales, scored as an inventory decision rather than a forecast metric.">
+<style>
+  :root {
+    --bg: #FBFAF8;
+    --surface: #FFFFFF;
+    --ink: #23201D;
+    --muted: #6B645D;
+    --line: #E3DED7;
+    --accent: #B5553D;
+    --good: #4C7A3E;
+    --gold: #B58900;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171614; --surface: #201E1B; --ink: #EDE9E3; --muted: #A9A29A;
+      --line: #322E2A; --accent: #D9765C; --good: #7FAE6B; --gold: #D9AC3A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171614; --surface: #201E1B; --ink: #EDE9E3; --muted: #A9A29A;
+    --line: #322E2A; --accent: #D9765C; --good: #7FAE6B; --gold: #D9AC3A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px 96px; }
+  header { padding: 72px 0 40px; border-bottom: 1px solid var(--line); margin-bottom: 44px; }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); line-height: 1.15; margin: 0 0 18px; letter-spacing: -0.02em; }
+  .lede { font-size: clamp(1.02rem, 2.4vw, 1.17rem); color: var(--muted); margin: 0 0 24px; max-width: 64ch; }
+  .lede strong { color: var(--ink); }
+  .links a {
+    display: inline-block; margin: 0 10px 10px 0; padding: 9px 15px;
+    border: 1px solid var(--line); border-radius: 7px; text-decoration: none;
+    color: var(--ink); background: var(--surface); font-size: 0.9rem; transition: border-color .15s;
+  }
+  .links a:hover { border-color: var(--accent); }
+  h2 {
+    font-size: 1.42rem; margin: 56px 0 8px; letter-spacing: -0.01em;
+    padding-top: 10px; border-top: 1px solid var(--line);
+  }
+  h2 .num { color: var(--accent); font-variant-numeric: tabular-nums; margin-right: 8px; }
+  h3 { font-size: 1.05rem; margin: 32px 0 6px; color: var(--muted); font-weight: 600; }
+  p { margin: 0 0 16px; max-width: 72ch; }
+  figure { margin: 26px 0; }
+  figure img {
+    width: 100%; height: auto; display: block;
+    border: 1px solid var(--line); border-radius: 9px; background: #fff;
+  }
+  figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 9px; max-width: 72ch; }
+  .tablewrap { overflow-x: auto; margin: 22px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; min-width: 460px; }
+  th, td { padding: 9px 12px; text-align: right; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--muted); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: .04em; }
+  tbody tr:hover { background: var(--surface); }
+  .win { color: var(--good); font-weight: 700; }
+  .lose { color: var(--accent); font-weight: 700; }
+  .callout {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+    padding: 16px 20px; margin: 26px 0;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+  .meta { font-size: 0.86rem; color: var(--muted); }
+  code {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 4px;
+    padding: 1px 5px; font-size: 0.86em;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  }
+  pre {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: 15px 17px; overflow-x: auto; font-size: 0.85rem; line-height: 1.55;
+  }
+  pre code { background: none; border: 0; padding: 0; }
+  ul { max-width: 72ch; padding-left: 22px; }
+  li { margin-bottom: 9px; }
+  footer {
+    margin-top: 72px; padding-top: 26px; border-top: 1px solid var(--line);
+    font-size: 0.86rem; color: var(--muted);
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Retail demand forecasting,<br>scored as an inventory decision</h1>
+  <p class="lede">
+    A forecasting pipeline on <strong>3,000,888 rows of real grocery sales</strong>, built around
+    a question the competition metric does not answer: <em>does this forecast lead to a better
+    purchase order?</em> Measured here, the two questions pick different models — the best RMSLE
+    leaves a stockout on <strong>41% of store-days</strong>.
+  </p>
+  <div class="links">
+    <a href="https://github.com/Rxyxs/retail-demand-forecasting-favorita">Source on GitHub</a>
+    <a href="https://www.kaggle.com/competitions/store-sales-time-series-forecasting">Dataset on Kaggle</a>
+    <a href="https://github.com/Rxyxs/retail-demand-forecasting-favorita/blob/main/README.es.md">Versión en español</a>
+  </div>
+</header>
+
+<p class="meta">
+  <strong>Data:</strong> Corporación Favorita (Ecuador), 54 stores × 33 product families,
+  2013-01-01 to 2017-08-15, downloaded 2026-10-02 via the Kaggle API. Competition rules apply;
+  the raw data is not redistributed. Granular retail demand is not public anywhere, so the choice
+  was real demand from a comparable South American grocery chain or invented demand with a local
+  label — this project takes the real data and says where it is from.
+</p>
+
+<h2><span class="num">1.</span>A quarter of the “zero demand” is not demand</h2>
+<p>
+  The panel is 31.3% zeros, which reads as severe intermittency and sends you looking for Croston
+  or a zero-inflated model. That number is wrong, and the reason is not in the schema.
+</p>
+
+<figure>
+  <img src="figures/zeros_decomposition.png" alt="Decomposition of the panel's zero rows into genuine zeros and stores that had not opened">
+  <figcaption>
+    Eight of the 54 stores open after the panel begins — the last on 2017-04-20, four months before
+    the data ends. The panel is padded, not truncated: until a store opens, all 33 of its families
+    report zero every day.
+  </figcaption>
+</figure>
+
+<div class="callout">
+  <p>
+    <strong>222,057 rows — 7.4% of the panel and 23.6% of every zero in the dataset</strong> — record
+    the absence of a store rather than the absence of demand. The real zero rate is <strong>25.8%</strong>,
+    not 31.3%, and the count of severely intermittent series drops from <strong>173 to 135</strong>.
+  </p>
+</div>
+
+<p>
+  A model trained on those rows learns “this store does not sell” about a store that had not opened,
+  and a metric computed over them collects credit for predicting zero where there was nothing to
+  predict. The pipeline flags them rather than dropping them silently, so both versions of each
+  number stay visible.
+</p>
+
+<figure>
+  <img src="figures/intermittency_distribution.png" alt="Histogram of the share of zero-sales days across the 1,782 series">
+  <figcaption>
+    Even after the correction, not one of the 1,782 series sells every day. The distribution is
+    bimodal — which is also why MAPE is absent from this project: it divides by the actual value,
+    zero on a quarter of the observations.
+  </figcaption>
+</figure>
+
+<h2><span class="num">2.</span>The forecast that wins the metric loses the decision</h2>
+<p>
+  The competition scores RMSLE on a point forecast. But nobody orders the mean. A buyer orders a
+  <em>quantity</em>, and being short (lost sale) does not cost the same as being long (excess stock,
+  markdown, tied-up capital). That is a newsvendor problem, and its answer is not the mean but a
+  quantile set by the cost ratio, <code>Cu / (Cu + Co)</code>.
+</p>
+
+<figure>
+  <img src="figures/accuracy_vs_decision.png" alt="Three models compared on RMSLE, service level and total cost">
+  <figcaption>The same three forecasts, scored three ways. “Best” moves between panels.</figcaption>
+</figure>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Model</th><th>RMSLE ↓</th><th>MASE ↓</th><th>Service ↑</th><th>Fill rate ↑</th><th>Total cost ↓</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Seasonal naive</td><td>0.6666</td><td>1.762</td><td>60.3%</td><td>87.8%</td><td>9.14M</td></tr>
+    <tr><td>LightGBM (mean)</td><td class="win">0.4148</td><td class="win">0.811</td><td>59.0%</td><td>94.3%</td><td>4.25M</td></tr>
+    <tr><td>LightGBM (quantile 80%)</td><td>0.5313</td><td>1.177</td><td class="win">84.0%</td><td class="win">97.3%</td><td class="win">3.92M</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout">
+  <p>
+    The mean model’s service level is <strong>59.0% — below the seasonal naive’s 60.3%</strong>, despite
+    being dramatically more accurate. Ordering the conditional mean leaves you short roughly half the
+    time by construction, however good the mean estimate is. Accuracy improved; the decision did not.
+  </p>
+</div>
+
+<h2><span class="num">3.</span>And it does not hold at every cost ratio</h2>
+<p>
+  The critical ratio is an assumption about the business. If the conclusion flips under a plausible
+  alternative, quoting only the favourable column is how a portfolio project becomes misleading.
+</p>
+
+<figure>
+  <img src="figures/cost_ratio_sensitivity.png" alt="Cost saving versus the mean forecast across cost ratios, and quantile calibration">
+  <figcaption>
+    Left: below roughly 3:1 the extra service costs more in excess stock than it saves in lost sales,
+    and ordering the mean wins. Right: delivered service tracks the requested quantile at every level.
+  </figcaption>
+</figure>
+
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th>Cost ratio</th><th>Critical quantile</th><th>Quantile cost</th><th>Mean cost</th><th>Saving</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>1:1</td><td>50%</td><td>1.93M</td><td>1.95M</td><td>+1.0%</td></tr>
+    <tr><td>2:1</td><td>67%</td><td>2.88M</td><td>2.72M</td><td class="lose">−5.9%</td></tr>
+    <tr><td>3:1</td><td>75%</td><td>3.50M</td><td>3.48M</td><td class="lose">−0.4%</td></tr>
+    <tr><td>4:1</td><td>80%</td><td>3.92M</td><td>4.25M</td><td class="win">+7.7%</td></tr>
+    <tr><td>6:1</td><td>86%</td><td>4.71M</td><td>5.77M</td><td class="win">+18.5%</td></tr>
+    <tr><td>9:1</td><td>90%</td><td>5.68M</td><td>8.07M</td><td class="win">+29.5%</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2><span class="num">4.</span>Method, in brief</h2>
+<ul>
+  <li><strong>Split by date, never at random.</strong> The last 16 days held out — the horizon the
+      competition asks for, so the backtest measures the stated problem.</li>
+  <li><strong>Every feature available at decision time.</strong> Lags and rolling statistics are
+      shifted inside each <code>store × family</code> series, so no series borrows another’s history
+      and nothing peeks ahead.</li>
+  <li><strong>Payday features.</strong> Ecuador, like Chile, pays salaries on the 15th and the last
+      working day, and grocery demand follows it.</li>
+  <li><strong>Oil forward-filled, not interpolated.</strong> The price that matters for a Sunday is
+      Friday’s — an interpolated value would be a look-ahead leak that never shows up as a failure.</li>
+  <li><strong>The 2016 earthquake is flagged, not removed.</strong> A model that does not know it
+      happened learns it as April seasonality and repeats it every year.</li>
+</ul>
+
+<h3>Reproduce</h3>
+<pre><code>pip install -r requirements.txt
+kaggle competitions download -c store-sales-time-series-forecasting -p data/raw --unzip
+python -m pytest -q          # 19 tests
+python -m src.pipeline       # full run -> outputs/results.json
+python -m src.make_figures   # redraws the figures above</code></pre>
+
+<h2><span class="num">5.</span>Honest limitations</h2>
+<ul>
+  <li><strong>Single-period newsvendor.</strong> No inventory carried between days, so today’s excess
+      does not cushion tomorrow’s shortage. Both cost columns would fall under a carry model; the
+      asymmetry between the two errors, which is the point, survives.</li>
+  <li><strong>The cost ratio is assumed, not measured.</strong> Favorita publishes no margin or
+      holding cost. Section 3 is the mitigation, and it shows the conclusion is ratio-dependent.</li>
+  <li><strong>No hierarchical reconciliation.</strong> Store × family forecasts are not constrained
+      to sum to store or national totals.</li>
+  <li><strong>Ecuador, not Chile.</strong> The seasonality that transfers is explicit in the features;
+      the demand levels do not transfer and are not claimed to.</li>
+  <li><strong>One split, 16 days.</strong> A rolling-origin backtest would put an error bar on these
+      comparisons. This one does not, so the differences above carry no confidence interval.</li>
+</ul>
+
+<footer>
+  Pablo Reyes ·
+  <a href="https://github.com/Rxyxs/retail-demand-forecasting-favorita">github.com/Rxyxs/retail-demand-forecasting-favorita</a>
+  · MIT. Every figure and number on this page is produced by <code>src/pipeline.py</code> and
+  <code>src/make_figures.py</code> from the downloaded dataset, and the run that produced them is
+  version-controlled in <code>outputs/results.json</code>.
+</footer>
+
+</div>
+</body>
+</html>

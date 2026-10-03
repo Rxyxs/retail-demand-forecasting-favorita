@@ -5,7 +5,7 @@
 ![Python](https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white)
 ![Polars](https://img.shields.io/badge/polars-rust--backed-CD792C)
 ![LightGBM](https://img.shields.io/badge/LightGBM-gradient_boosting-4C7A3E)
-![Tests](https://img.shields.io/badge/tests-19_pasando-brightgreen)
+[![tests](https://github.com/Rxyxs/retail-demand-forecasting-favorita/actions/workflows/tests.yml/badge.svg)](https://github.com/Rxyxs/retail-demand-forecasting-favorita/actions/workflows/tests.yml)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Un pipeline de pronóstico de demanda sobre **3.000.888 filas de ventas reales de

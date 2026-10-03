@@ -1,0 +1,51 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Los tests corren sobre paneles sinteticos chicos construidos dentro del
+      # propio test, no sobre el dataset de Kaggle: por eso aca no hace falta
+      # credencial ni descarga, y la suite termina en menos de un segundo. Fue
+      # una decision de diseno de los tests, no una limitacion de CI.
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+      # git grep mira solo archivos versionados, que es exactamente lo que se
+      # publica: un grep del arbol entero daria positivos del entorno virtual.
+      # El scan se excluye a si mismo porque el patron contiene las palabras que
+      # busca, y si no el workflow se bloquearia en cada corrida.
+      - name: Check for leaked credentials
+        run: |
+          if git grep -nE 'KAGGLE_KEY|KAGGLE_USERNAME' -- ':!.github/'; then
+            echo "::error::Credencial encontrada en un archivo versionado"
+            exit 1
+          fi
+          if git ls-files | grep -q 'kaggle\.json'; then
+            echo "::error::kaggle.json no debe estar en el repositorio"
+            exit 1
+          fi
+          echo "Sin credenciales expuestas."
+
+      - name: Check raw data was not committed
+        run: |
+          if git ls-files 'data/raw/*' | grep -q .; then
+            echo "::error::Los datos crudos de Kaggle no se redistribuyen (ver licencia de la competencia)"
+            exit 1
+          fi
+          echo "data/raw/ correctamente ausente del repositorio."
